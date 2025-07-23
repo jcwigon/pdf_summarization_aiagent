@@ -22,9 +22,13 @@ if 'api_key' not in st.session_state:
 api_key = st.text_input("Wklej swój klucz Groq API:", type="password", value=st.session_state['api_key'])
 key_loaded = st.button("Załaduj klucz")
 
+# 🟢 USUWANIE SPACJI I UKRYTYCH ZNAKÓW
+def clean_api_key(key):
+    return ''.join(c for c in key if 32 < ord(c) < 127)  # tylko ascii bez spacji i polskich znaków
+
 if key_loaded and api_key:
     st.session_state['api_key_loaded'] = True
-    st.session_state['api_key'] = api_key
+    st.session_state['api_key'] = clean_api_key(api_key)
 
 if st.session_state['api_key_loaded']:
     st.success("✅ API key załadowany")
@@ -43,7 +47,7 @@ if st.session_state['api_key_loaded']:
     def extract_key_points_with_groq_api(text, api_key):
         url = "https://api.groq.com/openai/v1/chat/completions"
         headers = {
-            "Authorization": f"Bearer {api_key}",
+            "Authorization": f"Bearer {clean_api_key(api_key)}",
             "Content-Type": "application/json"
         }
         prompt = (
@@ -69,7 +73,7 @@ if st.session_state['api_key_loaded']:
     def summarize_briefly_with_groq_api(text, api_key):
         url = "https://api.groq.com/openai/v1/chat/completions"
         headers = {
-            "Authorization": f"Bearer {api_key}",
+            "Authorization": f"Bearer {clean_api_key(api_key)}",
             "Content-Type": "application/json"
         }
         prompt = (
