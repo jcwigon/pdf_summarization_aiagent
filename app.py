@@ -14,6 +14,25 @@ st.info(
     """
 )
 
+def nice_box(content, bg="#fff", border="#E0E7EF"):
+    st.markdown(
+        f"""
+        <div style="
+            border-radius: 16px;
+            border: 2px solid {border};
+            background: {bg};
+            padding: 1.2em 1.5em;
+            margin-bottom: 1.5em;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            box-shadow: 0 3px 16px #0001;
+            ">
+            {content}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
 if 'api_key_loaded' not in st.session_state:
     st.session_state['api_key_loaded'] = False
 if 'api_key' not in st.session_state:
@@ -102,7 +121,8 @@ if st.session_state['api_key_loaded']:
 
         with tab1:
             st.subheader("Tekst z PDF:")
-            st.write(text[:4000] + ("..." if len(text) > 4000 else ""))
+            preview_text = text[:4000] + ("..." if len(text) > 4000 else "")
+            nice_box(preview_text.replace('\n', '<br>'))
 
         with tab2:
             if text.strip():
@@ -110,18 +130,16 @@ if st.session_state['api_key_loaded']:
                 with st.spinner("Ekstrakcja najważniejszych informacji..."):
                     key_points = extract_key_points_with_groq_api(text, st.session_state['api_key'])
                     st.header("Najważniejsze informacje")
-                    if '\n' in key_points:
-                        points = [line.strip() for line in key_points.split('\n') if line.strip()]
-                    else:
-                        points = [s.strip() for s in key_points.split('. ') if s.strip()]
-                    for point in points:
-                        st.markdown(f"- {point}")
+                    key_points_md = "<br>".join(
+                        f"- {line}" for line in [l.strip() for l in key_points.split('\n') if l.strip()]
+                    )
+                    nice_box(key_points_md)
 
                 # Streszczenie ogólne
                 with st.spinner("Generowanie streszczenia..."):
                     summary = summarize_briefly_with_groq_api(text, st.session_state['api_key'])
                     st.header("Streszczenie")
-                    st.write(summary)
+                    nice_box(summary.replace('\n', '<br>'))
             else:
                 st.warning("Nie udało się wyciągnąć tekstu z PDF-a.")
 else:
@@ -129,6 +147,7 @@ else:
         st.info("Wklej klucz i kliknij **Załaduj klucz**.")
     elif not api_key and key_loaded:
         st.warning("Wklej klucz przed kliknięciem 'Załaduj klucz'.")
+
 
 
 
