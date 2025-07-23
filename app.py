@@ -118,8 +118,10 @@ if st.session_state['api_key_loaded']:
             "Content-Type": "application/json"
         }
         prompt = (
-            "Stwórz krótkie streszczenie poniższego dokumentu po polsku (3-5 zdań). Podkreśl kluczowe tematy i główny cel dokumentu."
-            "\n\nTekst:\n" + text[:6000]
+            "Na podstawie poniższego tekstu stwórz krótkie streszczenie dokumentu po polsku (3–5 zdań). "
+            "Wypunktuj kluczowe tematy i określ główny cel dokumentu. "
+            "Odpowiedź ma być wyłącznie po polsku, bez używania języka angielskiego.\n\n"
+            "Tekst:\n" + text[:6000]
         )
         payload = {
             "model": "llama3-70b-8192",
@@ -133,26 +135,6 @@ if st.session_state['api_key_loaded']:
             return result["choices"][0]["message"]["content"]
         except Exception as e:
             return f"❌ Błąd generowania streszczenia: {e}\n\nSzczegóły: {response.text}"
-
-    def translate_to_polish(text, api_key):
-        url = "https://api.groq.com/openai/v1/chat/completions"
-        headers = {
-            "Authorization": f"Bearer {clean_api_key(api_key)}",
-            "Content-Type": "application/json"
-        }
-        prompt = f"Przetłumacz poniższy tekst na język polski, zachowując jego strukturę:\n\n{text}"
-        payload = {
-            "model": "llama3-70b-8192",
-            "messages": [{"role": "user", "content": prompt}],
-            "max_tokens": 500,
-            "temperature": 0.3
-        }
-        response = requests.post(url, json=payload, headers=headers)
-        try:
-            result = response.json()
-            return result["choices"][0]["message"]["content"]
-        except Exception as e:
-            return f"❌ Błąd tłumaczenia: {e}\n\nSzczegóły: {response.text}"
 
     if uploaded_file:
         with st.spinner("Wyciąganie tekstu z PDF..."):
@@ -176,19 +158,11 @@ if st.session_state['api_key_loaded']:
                     )
                     nice_box(key_points_md)
 
-                # Streszczenie + przycisk tłumaczenia
+                # Streszczenie ogólne
                 with st.spinner("Generowanie streszczenia..."):
                     summary = summarize_briefly_with_groq_api(text, st.session_state['api_key'])
                     st.header("Streszczenie")
-                    col1, col2 = st.columns([6, 2])
-                    with col1:
-                        nice_box(summary.replace('\n', '<br>'))
-                    with col2:
-                        if st.button("🔁 Przetłumacz na polski"):
-                            with st.spinner("Tłumaczenie na polski..."):
-                                translated = translate_to_polish(summary, st.session_state['api_key'])
-                                st.subheader("🇵🇱 Streszczenie po polsku")
-                                nice_box(translated.replace('\n', '<br>'))
+                    nice_box(summary.replace('\n', '<br>'))
             else:
                 st.warning("Nie udało się wyciągnąć tekstu z PDF-a.")
 else:
@@ -196,6 +170,7 @@ else:
         st.info("Wklej klucz i kliknij **Załaduj klucz**.")
     elif not api_key and key_loaded:
         st.warning("Wklej klucz przed kliknięciem 'Załaduj klucz'.")
+
 
 
 
