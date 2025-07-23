@@ -3,7 +3,7 @@ import PyPDF2
 import requests
 
 st.set_page_config(page_title="Agent PDF AI", page_icon="📄")
-st.title("📄 Agent AI do streszczenia PDF (Groq API)")
+st.title("📄 Agent AI do ekstrakcji informacji z PDF (Groq API)")
 
 st.info(
     """
@@ -14,7 +14,6 @@ st.info(
     """
 )
 
-# Przechowuj info o kluczu i jego statusie w session_state!
 if 'api_key_loaded' not in st.session_state:
     st.session_state['api_key_loaded'] = False
 if 'api_key' not in st.session_state:
@@ -41,19 +40,48 @@ if st.session_state['api_key_loaded']:
                 text += page_text + "\n"
         return text
 
-    def summarize_with_groq_api(text, api_key):
+    def extract_key_points_with_groq_api(text, api_key):
         url = "https://api.groq.com/openai/v1/chat/completions"
         headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json"
         }
-        prompt = "Streszcz ten dokument po polsku, podziel w punktach i na sekcje jeśli to możliwe:\n" + text[:6000]
+        prompt = (
+            "Wypisz najważniejsze informacje z dokumentu w punktach i sekcjach po polsku, "
+            "bez rozbudowanych opisów – tylko kluczowe dane, fakty, stanowiska, daty, nazwy, wartości itd."
+            "\n\nTekst:\n" + text[:6000]
+        )
         payload = {
             "model": "llama3-70b-8192",
             "messages": [
                 {"role": "user", "content": prompt}
             ],
-            "max_tokens": 700,
+            "max_tokens": 800,
+            "temperature": 0.2
+        }
+        response = requests.post(url, json=payload, headers=headers)
+        try:
+            result = response.json()
+            return result["choices"][0]["message"]["content"]
+        except Exception as e:
+            return f"❌ Błąd generowania najważniejszych informacji: {e}\n\nSzczegóły: {response.text}"
+
+    def summarize_briefly_with_groq_api(text, api_key):
+        url = "https://api.groq.com/openai/v1/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
+        prompt = (
+            "Stwórz krótkie streszczenie poniższego dokumentu po polsku (3-5 zdań). Podkreśl kluczowe tematy i główny cel dokumentu."
+            "\n\nTekst:\n" + text[:6000]
+        )
+        payload = {
+            "model": "llama3-70b-8192",
+            "messages": [
+                {"role": "user", "content": prompt}
+            ],
+            "max_tokens": 350,
             "temperature": 0.3
         }
         response = requests.post(url, json=payload, headers=headers)
@@ -70,16 +98,22 @@ if st.session_state['api_key_loaded']:
             st.write(text[:1000] + ("..." if len(text) > 1000 else ""))
 
         if text.strip():
-            with st.spinner("Generowanie streszczenia przez Groq..."):
-                summary = summarize_with_groq_api(text, st.session_state['api_key'])
-                st.subheader("Streszczenie AI (Groq):")
-                # Formatowanie w punkty
-                if '\n' in summary:
-                    points = [line.strip() for line in summary.split('\n') if line.strip()]
+            # Najważniejsze informacje (punkty)
+            with st.spinner("Ekstrakcja najważniejszych informacji..."):
+                key_points = extract_key_points_with_groq_api(text, st.session_state['api_key'])
+                st.header("Najważniejsze informacje")
+                if '\n' in key_points:
+                    points = [line.strip() for line in key_points.split('\n') if line.strip()]
                 else:
-                    points = [s.strip() for s in summary.split('. ') if s.strip()]
+                    points = [s.strip() for s in key_points.split('. ') if s.strip()]
                 for point in points:
                     st.markdown(f"- {point}")
+
+            # Streszczenie ogólne
+            with st.spinner("Generowanie streszczenia..."):
+                summary = summarize_briefly_with_groq_api(text, st.session_state['api_key'])
+                st.header("Streszczenie")
+                st.write(summary)
         else:
             st.warning("Nie udało się wyciągnąć tekstu z PDF-a.")
 else:
@@ -87,6 +121,7 @@ else:
         st.info("Wklej klucz i kliknij **Załaduj klucz**.")
     elif not api_key and key_loaded:
         st.warning("Wklej klucz przed kliknięciem 'Załaduj klucz'.")
+
 
 
 
