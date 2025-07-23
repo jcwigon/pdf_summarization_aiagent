@@ -1,13 +1,32 @@
-# Agent PDF AI
+# 📄 Agent AI do ekstrakcji informacji z PDF (Groq API)
 
-Aplikacja do streszczania plików PDF przy użyciu AI DeepSeek (API).
+Aplikacja Streamlit do ekstrakcji kluczowych informacji oraz generowania krótkiego streszczenia z plików PDF przy użyciu modeli Groq (Llama3).  
+**Idealna do szybkiej analizy dokumentów PDF po polsku!**
 
-## Jak korzystać?
+---
 
-1. Wejdź na [https://platform.deepseek.com/api-keys](https://platform.deepseek.com/api-keys)
-2. Załóż darmowe konto lub zaloguj się.
-3. Kliknij w menu "API Keys" i wygeneruj swój klucz (lub skopiuj już istniejący).
-4. Wklej klucz w aplikacji Streamlit (pole “Wklej swój klucz DeepSeek API”).
-5. Wrzuć PDF i kliknij “Generuj streszczenie”.
+## ⚡ Jak korzystać?
 
-**Każdy użytkownik korzysta ze swojego darmowego limitu!**
+1. **Załóż darmowe konto** lub **zaloguj się** na [Groq Platform](https://console.groq.com/keys).
+2. **Wygeneruj nowy klucz API** ("Create API Key").
+3. **Wklej klucz** w aplikacji i kliknij `Załaduj klucz`.
+4. **Wrzuć plik PDF** i przejdź do zakładki "Ekstrakcja AI".
+
+---
+
+## ✨ Funkcjonalności
+
+- **Ekstrakcja najważniejszych informacji** z PDF (punkty, sekcje, fakty).
+- **Krótkie streszczenie** dokumentu.
+- Estetyczny i intuicyjny interfejs Streamlit (podgląd PDF + wyniki AI na oddzielnej zakładce).
+- Obsługa plików PDF w języku polskim i angielskim.
+- Bez limitu lokalnych zapytań (model Llama3 przez API Groq).
+
+---
+
+## 🚀 Uruchomienie lokalne
+
+1. Sklonuj repozytorium lub pobierz pliki.
+2. Zainstaluj wymagane biblioteki:
+   ```bash
+   pip install -r requirements.txt
