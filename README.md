@@ -1,29 +1,17 @@
-# Agent AI PDF – Streamlit App
+# Agent PDF AI
 
-Aplikacja do analizy dokumentów PDF z użyciem AI (OpenAI GPT) – wdrożona na Streamlit Cloud.
+Aplikacja webowa do analizy i streszczania plików PDF z wykorzystaniem modeli językowych DeepSeek (transformers).  
+Wystarczy wrzucić plik PDF – aplikacja automatycznie wyodrębni treść i wygeneruje czytelne streszczenie.
 
 ## Funkcje
+
 - Wyciąganie tekstu z plików PDF
-- Automatyczne streszczenie dokumentu przez GPT-3.5/4 (OpenAI)
-- Prosty i nowoczesny interfejs (Streamlit)
-- Wsparcie dla plików PDF z polskimi znakami
+- Automatyczne streszczanie dokumentu
+- Prosty, intuicyjny interfejs webowy
+- Brak konieczności logowania lub użycia kluczy API
 
-## Jak uruchomić aplikację lokalnie?
-1. Zainstaluj wymagane biblioteki:
-    ```
-    pip install -r requirements.txt
-    ```
-2. Uruchom aplikację:
-    ```
-    streamlit run app.py
-    ```
-3. Wklej swój klucz OpenAI i wrzuć PDF – aplikacja pokaże tekst oraz streszczenie dokumentu.
+## Uruchomienie lokalnie
 
-## Deployment na Streamlit Cloud
-1. Stwórz repozytorium na GitHub i wrzuć pliki: `app.py`, `requirements.txt`, `README.md`
-2. Przejdź na [https://share.streamlit.io/](https://share.streamlit.io/) i połącz repozytorium
-3. Aplikacja działa od razu online (do wprowadzenia własnego klucza OpenAI przez użytkownika)
-
-## Autor
-Jakub Ćwigoń  
-2025
+```bash
+pip install -r requirements.txt
+streamlit run app.py
