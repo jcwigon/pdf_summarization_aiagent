@@ -22,9 +22,8 @@ if 'api_key' not in st.session_state:
 api_key = st.text_input("Wklej swój klucz Groq API:", type="password", value=st.session_state['api_key'])
 key_loaded = st.button("Załaduj klucz")
 
-# 🟢 USUWANIE SPACJI I UKRYTYCH ZNAKÓW
 def clean_api_key(key):
-    return ''.join(c for c in key if 32 < ord(c) < 127)  # tylko ascii bez spacji i polskich znaków
+    return ''.join(c for c in key if 32 < ord(c) < 127)
 
 if key_loaded and api_key:
     st.session_state['api_key_loaded'] = True
@@ -98,33 +97,39 @@ if st.session_state['api_key_loaded']:
     if uploaded_file:
         with st.spinner("Wyciąganie tekstu z PDF..."):
             text = extract_text_from_pdf(uploaded_file)
+
+        tab1, tab2 = st.tabs(["📄 Podgląd PDF", "🤖 Ekstrakcja AI"])
+
+        with tab1:
             st.subheader("Tekst z PDF:")
-            st.write(text[:1000] + ("..." if len(text) > 1000 else ""))
+            st.write(text[:4000] + ("..." if len(text) > 4000 else ""))
 
-        if text.strip():
-            # Najważniejsze informacje (punkty)
-            with st.spinner("Ekstrakcja najważniejszych informacji..."):
-                key_points = extract_key_points_with_groq_api(text, st.session_state['api_key'])
-                st.header("Najważniejsze informacje")
-                if '\n' in key_points:
-                    points = [line.strip() for line in key_points.split('\n') if line.strip()]
-                else:
-                    points = [s.strip() for s in key_points.split('. ') if s.strip()]
-                for point in points:
-                    st.markdown(f"- {point}")
+        with tab2:
+            if text.strip():
+                # Najważniejsze informacje (punkty)
+                with st.spinner("Ekstrakcja najważniejszych informacji..."):
+                    key_points = extract_key_points_with_groq_api(text, st.session_state['api_key'])
+                    st.header("Najważniejsze informacje")
+                    if '\n' in key_points:
+                        points = [line.strip() for line in key_points.split('\n') if line.strip()]
+                    else:
+                        points = [s.strip() for s in key_points.split('. ') if s.strip()]
+                    for point in points:
+                        st.markdown(f"- {point}")
 
-            # Streszczenie ogólne
-            with st.spinner("Generowanie streszczenia..."):
-                summary = summarize_briefly_with_groq_api(text, st.session_state['api_key'])
-                st.header("Streszczenie")
-                st.write(summary)
-        else:
-            st.warning("Nie udało się wyciągnąć tekstu z PDF-a.")
+                # Streszczenie ogólne
+                with st.spinner("Generowanie streszczenia..."):
+                    summary = summarize_briefly_with_groq_api(text, st.session_state['api_key'])
+                    st.header("Streszczenie")
+                    st.write(summary)
+            else:
+                st.warning("Nie udało się wyciągnąć tekstu z PDF-a.")
 else:
     if api_key and not st.session_state['api_key_loaded']:
         st.info("Wklej klucz i kliknij **Załaduj klucz**.")
     elif not api_key and key_loaded:
         st.warning("Wklej klucz przed kliknięciem 'Załaduj klucz'.")
+
 
 
 
