@@ -3,15 +3,14 @@ import PyPDF2
 import requests
 
 st.set_page_config(page_title="Agent PDF AI", page_icon="📄")
-st.title("📄 Agent AI do streszczenia PDF")
+st.title("📄 Agent AI do streszczenia PDF (Groq API)")
 
 st.info(
     """
     **Jak korzystać z aplikacji?**
-    1. Załóż darmowe konto lub zaloguj się na [DeepSeek Platform](https://platform.deepseek.com/api-keys).
-    2. Po zalogowaniu kliknij "API Keys" (u góry strony).
-    3. Wygeneruj nowy klucz lub skopiuj już istniejący.
-    4. Wklej swój klucz API poniżej i kliknij **Załaduj klucz**.
+    1. Załóż darmowe konto lub zaloguj się na [Groq Platform](https://console.groq.com/keys).
+    2. Wygeneruj nowy klucz (API Key).
+    3. Wklej swój klucz API poniżej i kliknij **Załaduj klucz**.
     """
 )
 
@@ -21,7 +20,7 @@ if 'api_key_loaded' not in st.session_state:
 if 'api_key' not in st.session_state:
     st.session_state['api_key'] = ""
 
-api_key = st.text_input("Wklej swój klucz DeepSeek API:", type="password", value=st.session_state['api_key'])
+api_key = st.text_input("Wklej swój klucz Groq API:", type="password", value=st.session_state['api_key'])
 key_loaded = st.button("Załaduj klucz")
 
 if key_loaded and api_key:
@@ -42,16 +41,20 @@ if st.session_state['api_key_loaded']:
                 text += page_text + "\n"
         return text
 
-    def summarize_with_deepseek_api(text, api_key):
-        url = "https://api.deepseek.com/v1/chat/completions"
-        headers = {"Authorization": f"Bearer {api_key}"}
-        prompt = "Streszcz ten dokument po polsku w punktach:\n" + text[:3500]
+    def summarize_with_groq_api(text, api_key):
+        url = "https://api.groq.com/openai/v1/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
+        prompt = "Streszcz ten dokument po polsku, podziel w punktach i na sekcje jeśli to możliwe:\n" + text[:6000]
         payload = {
-            "model": "deepseek-chat",
+            "model": "llama3-70b-8192",
             "messages": [
-                {"role": "system", "content": "Jesteś pomocnym asystentem AI."},
                 {"role": "user", "content": prompt}
-            ]
+            ],
+            "max_tokens": 700,
+            "temperature": 0.3
         }
         response = requests.post(url, json=payload, headers=headers)
         try:
@@ -67,9 +70,9 @@ if st.session_state['api_key_loaded']:
             st.write(text[:1000] + ("..." if len(text) > 1000 else ""))
 
         if text.strip():
-            with st.spinner("Generowanie streszczenia przez DeepSeek..."):
-                summary = summarize_with_deepseek_api(text, st.session_state['api_key'])
-                st.subheader("Streszczenie AI (DeepSeek):")
+            with st.spinner("Generowanie streszczenia przez Groq..."):
+                summary = summarize_with_groq_api(text, st.session_state['api_key'])
+                st.subheader("Streszczenie AI (Groq):")
                 # Formatowanie w punkty
                 if '\n' in summary:
                     points = [line.strip() for line in summary.split('\n') if line.strip()]
