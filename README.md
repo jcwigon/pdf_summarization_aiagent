@@ -1,17 +1,13 @@
 # Agent PDF AI
 
-Aplikacja webowa do analizy i streszczania plików PDF z wykorzystaniem modeli językowych DeepSeek (transformers).  
-Wystarczy wrzucić plik PDF – aplikacja automatycznie wyodrębni treść i wygeneruje czytelne streszczenie.
+Aplikacja do streszczania plików PDF przy użyciu AI DeepSeek (API).
 
-## Funkcje
+## Jak korzystać?
 
-- Wyciąganie tekstu z plików PDF
-- Automatyczne streszczanie dokumentu
-- Prosty, intuicyjny interfejs webowy
-- Brak konieczności logowania lub użycia kluczy API
+1. Wejdź na [https://platform.deepseek.com/api-keys](https://platform.deepseek.com/api-keys)
+2. Załóż darmowe konto lub zaloguj się.
+3. Kliknij w menu "API Keys" i wygeneruj swój klucz (lub skopiuj już istniejący).
+4. Wklej klucz w aplikacji Streamlit (pole “Wklej swój klucz DeepSeek API”).
+5. Wrzuć PDF i kliknij “Generuj streszczenie”.
 
-## Uruchomienie lokalnie
-
-```bash
-pip install -r requirements.txt
-streamlit run app.py
+**Każdy użytkownik korzysta ze swojego darmowego limitu!**
