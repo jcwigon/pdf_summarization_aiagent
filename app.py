@@ -3,7 +3,7 @@ import PyPDF2
 import requests
 
 st.set_page_config(page_title="Agent PDF AI", page_icon="📄")
-st.title("📄 Agent AI do ekstrakcji informacji z PDF (Groq API)")
+st.title("📄 Agent AI do ekstrakcji informacji z PDF")
 
 # --- Cała instrukcja (z obrazkiem) w ramce na jasnym tle
 def instruction_box():
