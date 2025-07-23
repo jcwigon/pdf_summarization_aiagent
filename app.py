@@ -15,11 +15,20 @@ st.info(
     """
 )
 
-# Sekcja ładowania klucza API
-api_key = st.text_input("Wklej swój klucz DeepSeek API:", type="password")
+# Przechowuj info o kluczu i jego statusie w session_state!
+if 'api_key_loaded' not in st.session_state:
+    st.session_state['api_key_loaded'] = False
+if 'api_key' not in st.session_state:
+    st.session_state['api_key'] = ""
+
+api_key = st.text_input("Wklej swój klucz DeepSeek API:", type="password", value=st.session_state['api_key'])
 key_loaded = st.button("Załaduj klucz")
 
 if key_loaded and api_key:
+    st.session_state['api_key_loaded'] = True
+    st.session_state['api_key'] = api_key
+
+if st.session_state['api_key_loaded']:
     st.success("✅ API key załadowany")
     st.markdown("---")
     uploaded_file = st.file_uploader("Wrzuć plik PDF", type=["pdf"])
@@ -59,7 +68,7 @@ if key_loaded and api_key:
 
         if text.strip():
             with st.spinner("Generowanie streszczenia przez DeepSeek..."):
-                summary = summarize_with_deepseek_api(text, api_key)
+                summary = summarize_with_deepseek_api(text, st.session_state['api_key'])
                 st.subheader("Streszczenie AI (DeepSeek):")
                 # Formatowanie w punkty
                 if '\n' in summary:
@@ -71,7 +80,7 @@ if key_loaded and api_key:
         else:
             st.warning("Nie udało się wyciągnąć tekstu z PDF-a.")
 else:
-    if api_key and not key_loaded:
+    if api_key and not st.session_state['api_key_loaded']:
         st.info("Wklej klucz i kliknij **Załaduj klucz**.")
     elif not api_key and key_loaded:
         st.warning("Wklej klucz przed kliknięciem 'Załaduj klucz'.")
