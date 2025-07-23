@@ -1,18 +1,29 @@
 import streamlit as st
 import PyPDF2
 import requests
+from PIL import Image
 
 st.set_page_config(page_title="Agent PDF AI", page_icon="📄")
 st.title("📄 Agent AI do ekstrakcji informacji z PDF (Groq API)")
 
-st.info(
-    """
-    **Jak korzystać z aplikacji?**
-    1. Załóż darmowe konto lub zaloguj się na [Groq Platform](https://console.groq.com/keys).
-    2. Wygeneruj nowy klucz (API Key).
-    3. Wklej swój klucz API poniżej i kliknij **Załaduj klucz**.
-    """
-)
+# --- Nowa instrukcja z obrazkiem pod punktem 2
+with st.container():
+    st.markdown(
+        """
+        **Jak korzystać z aplikacji?**
+        1. Załóż darmowe konto lub zaloguj się na [Groq Platform](https://console.groq.com/keys).  
+        2. Wygeneruj nowy klucz (API Key):
+        """,
+        unsafe_allow_html=True
+    )
+    img = Image.open("Api groq.png")
+    st.image(img, width=220, caption="Przycisk 'Create API Key' na Groq Platform")
+    st.markdown(
+        """
+        3. Wklej swój klucz API poniżej i kliknij **Załaduj klucz**.
+        """,
+        unsafe_allow_html=True
+    )
 
 def nice_box(content, bg="#fff", border="#E0E7EF"):
     st.markdown(
